@@ -72,20 +72,33 @@ public class Order {
 
 
 }
+
 class OrderDeserializer extends JsonDeserializer<Order> {
+
+
     @Override
     public Order deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        p.nextValue(); // skip orderId field name
-        String orderId = p.getText(); // read orderId value as String
-        p.nextValue(); // skip orderValue field name
-        BigDecimal orderValue = p.getDecimalValue(); // read orderValue value
-        p.nextValue(); // skip completeBy field name
-        LocalTime completeBy = LocalTime.parse(p.getValueAsString()); // read completeBy value
-        p.nextValue(); // skip picker field name
-        Picker picker = ctxt.readValue(p, Picker.class); // read picker value
-        p.nextValue(); // skip pickingTime field name
-        Duration pickingDuration = Duration.parse(p.getValueAsString());
-        LocalTime pickingTime = LocalTime.MIN.plus(pickingDuration);
-        return new Order(orderId, orderValue, completeBy, picker, pickingTime);
+        try {
+            p.nextValue(); // skip orderId field name
+            String orderId = p.getText(); // read orderId value as String
+            System.out.println("orderId: " + orderId);
+            p.nextValue(); // skip orderValue field name
+            BigDecimal orderValue = new BigDecimal(p.getValueAsString()); // read orderValue value
+            System.out.println("orderValue: " + orderValue);
+            p.nextValue(); // skip pickingTime field name
+            String pickingTimeString = p.getText(); // read pickingTime value as string
+            Duration pickingDuration = Duration.parse(pickingTimeString);
+            LocalTime pickingTime = LocalTime.MIN.plus(pickingDuration);
+            System.out.println("pickingTime: " + pickingTime);
+            p.nextValue(); // skip completeBy field name
+            LocalTime completeBy = LocalTime.parse(p.getValueAsString()); // read completeBy value
+            System.out.println("completeBy: " + completeBy);
+            p.nextValue(); // skip picker field name
+            Picker picker = new Picker();
+
+            return new Order(orderId, orderValue, completeBy, picker, pickingTime);
+        } catch (Exception e) {
+            throw new IOException("Error deserializing Order at " + p.getCurrentLocation() + ": " + e.getMessage(), e);
+        }
     }
 }

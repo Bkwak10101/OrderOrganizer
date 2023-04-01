@@ -28,6 +28,7 @@ public class Picker {
         this.name = name;
     }
     public Picker() {
+        this.workingHours = new ArrayList<>();
     }
 
     public String getName() {

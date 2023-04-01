@@ -1,5 +1,6 @@
 package com.github.bkwak.organizer;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -11,6 +12,11 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 @JsonDeserialize(using = OrderDeserializer.class)
+=======
+import java.math.BigDecimal;
+import java.time.LocalTime;
+
+>>>>>>> 937dab612da90afa1ef30b7dbe198830b47ef9b8
 public class Order {
     private String orderId;
     private BigDecimal orderValue;
@@ -69,6 +75,7 @@ public class Order {
     public void setPickingTime(LocalTime pickingTime) {
         this.pickingTime = pickingTime;
     }
+<<<<<<< HEAD
 
 
 }
@@ -88,4 +95,6 @@ class OrderDeserializer extends JsonDeserializer<Order> {
         LocalTime pickingTime = LocalTime.MIN.plus(pickingDuration);
         return new Order(orderId, orderValue, completeBy, picker, pickingTime);
     }
+=======
+>>>>>>> 937dab612da90afa1ef30b7dbe198830b47ef9b8
 }

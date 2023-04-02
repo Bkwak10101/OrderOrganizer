@@ -3,6 +3,8 @@ package com.github.bkwak.organizer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.bkwak.organizer.model.Order;
+import com.github.bkwak.organizer.model.OrderCompleteByComparator;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,13 +16,13 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // sprawdzenie, czy podano argumenty wiersza poleceń
+        // check if command line arguments are provided
         if (args.length != 2) {
             System.err.println("Usage: java -jar app.jar <store_file> <orders_file>");
             System.exit(1);
         }
 
-        // wczytanie pliku store.json
+        // read store.json file
         File storeFile = new File(args[0]);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -33,7 +35,7 @@ public class Main {
             return;
         }
 
-        // wczytanie pliku orders.json
+        // read orders.json file
         File ordersFile = new File(args[1]);
         List<Order> orders;
         try {
@@ -44,10 +46,10 @@ public class Main {
             return;
         }
 
-        // sortowanie zamówień według czasu completeBy
+        // sort orders by completeBy time
         Collections.sort(orders, new OrderCompleteByComparator());
 
-        // sprawdzenie poprawności wczytanych danych
+        // check if loaded data is valid
         if (store.getPickers().isEmpty()) {
             System.err.println("No pickers specified in the store file.");
             System.exit(1);
@@ -83,13 +85,11 @@ public class Main {
 
 
 
-        // przypisanie zamówień do pracowników
+        // assign orders to pickers
         if (orders.size() >= store.getPickers().size()) {
-            // przypisanie co najmniej jednego zamówienia dla każdego pracownika
             int ordersPerPicker = orders.size() / store.getPickers().size();
             int remainingOrders = orders.size() % store.getPickers().size();
 
-            // przypisanie zamówień
             int currentOrder = 0;
             for (Picker picker : store.getPickers()) {
                 int ordersToAssign = ordersPerPicker;
@@ -101,46 +101,38 @@ public class Main {
                     Order order = orders.get(currentOrder++);
                     order.setPicker(picker);
 
-                    // wyznaczanie harmonogramu pracy dla danego pracownika
+                    // setting a work schedule for a given employee
                     Schedule schedule = new Schedule((List<LocalTime[]>) picker.getWorkingHours().get(0), store.getPickingStartTime(), store.getPickingEndTime(), orders);
-                    // wyznaczanie konfliktów dla zamówienia
+                    // set conflicts for the order
                     int conflicts = schedule.countConflicts(order.getPickingTime(), order.getCompleteBy());
-                    // aktualizacja liczby konfliktów dla pracownika
-                    List<LocalTime> conflictsList = new ArrayList<>(); // utworzenie pustej listy
+                    List<LocalTime> conflictsList = new ArrayList<>();
                     for (int j = 0; j < conflicts; j++) {
                         conflictsList.add(LocalTime.of(0, 0, 0));
-                        // dodanie elementu do listy, w tym przypadku dodajemy czas trwania konfliktu równy 0 sekund
                     }
                     picker.getConflicts().addAll(conflictsList); //
                 }
             }
         } else {
-            // przypisanie każdego zamówienia do innego pracownika
+            // assigning each order to a different employee
             int currentPicker = 0;
             for (Order order : orders) {
                 Picker picker = store.getPickers().get(currentPicker);
                 order.setPicker(picker);
 
-                // wyznaczanie harmonogramu pracy dla danego pracownika
+                // setting a work schedule for a given employee
                 Schedule schedule = new Schedule((List<LocalTime[]>) picker.getWorkingHours().get(0), store.getPickingStartTime(), store.getPickingEndTime(), orders);
 
-                // wyznaczanie konfliktów dla zamówienia
+                // determine conflicts for the order
                 int conflicts = schedule.countConflicts(order.getPickingTime(), order.getCompleteBy());
-                // aktualizacja liczby konfliktów dla pracownika
                 picker.getConflicts().addAll(Collections.nCopies(conflicts, LocalTime.of(0, 0, 0)));
 
                 currentPicker = (currentPicker + 1) % store.getPickers().size();
             }
         }
-
-        // wyświetlenie wyników przypisania zamówień do pracowników
         System.out.println("Assignment of orders to pickers:");
         for (Order order : orders) {
             System.out.println("Order " + order.getOrderId() + " assigned to picker " + order.getPicker().getName());
         }
-
-
-
 
     }
 }

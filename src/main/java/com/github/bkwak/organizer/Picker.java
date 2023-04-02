@@ -1,5 +1,7 @@
 package com.github.bkwak.organizer;
 
+import com.github.bkwak.organizer.model.Order;
+
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.github.bkwak.organizer;
+package com.github.bkwak.organizer.model;
 
 import java.util.Comparator;
 

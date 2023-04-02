@@ -1,5 +1,7 @@
 package com.github.bkwak.organizer;
 
+import com.github.bkwak.organizer.model.Order;
+
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +14,8 @@ public class Schedule {
     private LocalTime pickingEndTime;
     private List<Order> orders;
 
-    public Schedule(List<LocalTime[]> workingHours, LocalTime pickingStartTime, LocalTime pickingEndTime, List<Order> orders) {
+    public Schedule(List<LocalTime[]> workingHours, LocalTime pickingStartTime, LocalTime pickingEndTime,
+                    List<Order> orders) {
         List<LocalTime> hoursList = new ArrayList<>();
         for (LocalTime[] hours : workingHours) {
             for (int i = 0; i < hours.length; i++) {
@@ -64,7 +67,8 @@ public class Schedule {
         return 0;
     }
 
-    private int getOrderStartSlot(LocalTime pickingTime, LocalTime[] workingHours, LocalTime pickingStartTime, LocalTime pickingEndTime) {
+    private int getOrderStartSlot(LocalTime pickingTime, LocalTime[] workingHours, LocalTime pickingStartTime,
+                                  LocalTime pickingEndTime) {
         if (pickingTime.isBefore(pickingStartTime)) {
             return 0;
         } else if (pickingTime.isAfter(pickingEndTime)) {
@@ -79,7 +83,8 @@ public class Schedule {
         }
     }
 
-    private int getOrderEndSlot(LocalTime completeBy, LocalTime[] workingHours, LocalTime pickingStartTime, LocalTime pickingEndTime) {
+    private int getOrderEndSlot(LocalTime completeBy, LocalTime[] workingHours, LocalTime pickingStartTime,
+                                LocalTime pickingEndTime) {
         if (completeBy.isBefore(pickingStartTime)) {
             return 0;
         } else if (completeBy.isAfter(pickingEndTime)) {

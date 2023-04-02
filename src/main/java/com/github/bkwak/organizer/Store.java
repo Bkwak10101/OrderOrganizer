@@ -10,6 +10,7 @@ public class Store {
     private LocalTime pickingStartTime;
     private LocalTime pickingEndTime;
     private List<Order> orders;
+
     public Store() {
     }
 
@@ -24,12 +25,12 @@ public class Store {
         return pickers;
     }
 
-    public List<Order> getOrders() {
-        return orders;
-    }
-
     public void setPickers(List<Picker> pickers) {
         this.pickers = pickers;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
     }
 
     public LocalTime getPickingStartTime() {

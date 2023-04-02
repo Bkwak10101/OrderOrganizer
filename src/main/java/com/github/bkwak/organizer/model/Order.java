@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.bkwak.organizer.Picker;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @JsonDeserialize(using = OrderDeserializer.class)
@@ -65,7 +66,13 @@ public class Order {
     public void setPickingTime(LocalTime pickingTime) {
         this.pickingTime = pickingTime;
     }
-
+//    public LocalDateTime getEstimatedTime(Employee employee) {
+//        int totalTime = 0;
+//        for (Item item : items) {
+//            totalTime += item.getTimeToComplete();
+//        }
+//        return employee.getNextFreeTime().plusMinutes(totalTime);
+//    }
 
 }
 

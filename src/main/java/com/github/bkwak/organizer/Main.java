@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
     public static void main(String[] args) {
@@ -39,7 +40,8 @@ public class Main {
         File ordersFile = new File(args[1]);
         List<Order> orders;
         try {
-            orders = objectMapper.readValue(ordersFile, new TypeReference<List<Order>>() {});
+            orders = objectMapper.readValue(ordersFile, new TypeReference<List<Order>>() {
+            });
         } catch (IOException e) {
             System.err.println("Error reading orders file: " + e.getMessage());
             System.exit(1);
@@ -84,7 +86,6 @@ public class Main {
         }
 
 
-
         // assign orders to pickers
         if (orders.size() >= store.getPickers().size()) {
             int ordersPerPicker = orders.size() / store.getPickers().size();
@@ -114,20 +115,23 @@ public class Main {
             }
         } else {
             // assigning each order to a different employee
-            int currentPicker = 0;
-            for (Order order : orders) {
-                Picker picker = store.getPickers().get(currentPicker);
-                order.setPicker(picker);
+            AtomicInteger currentPicker = new AtomicInteger(0);
+            orders.stream()
+                    .forEach(order -> {
+                        Picker picker = store.getPickers()
+                                .get(currentPicker.getAndIncrement() % store.getPickers().size());
+                        order.setPicker(picker);
 
-                // setting a work schedule for a given employee
-                Schedule schedule = new Schedule((List<LocalTime[]>) picker.getWorkingHours().get(0), store.getPickingStartTime(), store.getPickingEndTime(), orders);
+                        // setting a work schedule for a given employee
+                        Schedule schedule = new Schedule((List<LocalTime[]>) picker
+                                .getWorkingHours().get(0), store.getPickingStartTime(), store.getPickingEndTime(), orders);
 
-                // determine conflicts for the order
-                int conflicts = schedule.countConflicts(order.getPickingTime(), order.getCompleteBy());
-                picker.getConflicts().addAll(Collections.nCopies(conflicts, LocalTime.of(0, 0, 0)));
+                        // determine conflicts for the order
+                        int conflicts = schedule.countConflicts(order.getPickingTime(), order.getCompleteBy());
+                        picker.getConflicts()
+                                .addAll(Collections.nCopies(conflicts, LocalTime.of(0, 0, 0)));
+                    });
 
-                currentPicker = (currentPicker + 1) % store.getPickers().size();
-            }
         }
         System.out.println("Assignment of orders to pickers:");
         for (Order order : orders) {

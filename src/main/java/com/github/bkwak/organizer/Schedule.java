@@ -33,10 +33,10 @@ public class Schedule {
         int endSlot = getOrderEndSlot(completeBy);
 
         int conflicts = 0;
-        for (int i = 0; i < schedule.length; i++) {
+        for (boolean[] booleans : schedule) {
             boolean conflict = false;
             for (int j = startSlot; j < endSlot; j++) {
-                if (schedule[i][j]) {
+                if (booleans[j]) {
                     conflict = true;
                     break;
                 }
@@ -98,4 +98,9 @@ public class Schedule {
             return workingHours.length;
         }
     }
+
+    public void setSchedule(boolean[][] schedule) {
+        this.schedule = schedule;
+    }
+
 }
